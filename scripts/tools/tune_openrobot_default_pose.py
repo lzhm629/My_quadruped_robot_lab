@@ -25,7 +25,7 @@ from isaaclab.app import AppLauncher
 
 
 parser = argparse.ArgumentParser(description=__doc__)
-parser.add_argument("--base_height", type=float, default=0.583, help="Initial base-link height in metres.")
+parser.add_argument("--base_height", type=float, default=0.69, help="Initial base-link height in metres.")
 parser.add_argument(
     "--save_file",
     type=Path,

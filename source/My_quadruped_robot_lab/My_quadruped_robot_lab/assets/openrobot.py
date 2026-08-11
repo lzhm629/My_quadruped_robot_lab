@@ -48,13 +48,13 @@ OPENROBOT_WHEELFIXED_CFG = ArticulationCfg(
     init_state=ArticulationCfg.InitialStateCfg(
         # Nominal mirrored stance measured with the default-pose tuning tool.
         # The base height leaves the foot collision meshes just above the ground.
-        pos=(0.0, 0.0, 0.583),
+        pos=(0.0, 0.0, 0.69),
         joint_pos={
             ".*_hip_joint": 0.0,
-            "^(FR|RR)_thigh_joint$": -0.3,
-            "^(FL|RL)_thigh_joint$": 0.3,
-            "^(FR|RR)_calf_joint$": -0.1,
-            "^(FL|RL)_calf_joint$": 0.1,
+            "^(FR|RR)_thigh_joint$": -0.7,
+            "^(FL|RL)_thigh_joint$": 0.7,
+            "^(FR|RR)_calf_joint$": 0.3,
+            "^(FL|RL)_calf_joint$": -0.3,
         },
         joint_vel={".*": 0.0},
     ),

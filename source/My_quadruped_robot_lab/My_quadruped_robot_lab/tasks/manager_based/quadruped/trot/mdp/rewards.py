@@ -84,3 +84,33 @@ def hip_deviation_l1(env: ManagerBasedRLEnv, asset_cfg: SceneEntityCfg) -> torch
     asset: Articulation = env.scene[asset_cfg.name]
     return torch.sum(torch.abs(asset.data.joint_pos[:, asset_cfg.joint_ids]), dim=-1)
 
+
+def idle_when_commanded(
+    env: ManagerBasedRLEnv,
+    command_name: str,
+    cmd_threshold: float = 0.2,
+    vel_threshold: float = 0.1,
+    asset_cfg: SceneEntityCfg = SceneEntityCfg("robot"),
+) -> torch.Tensor:
+    """Penalize the robot for staying almost still when a velocity command is given.
+
+    Returns 1.0 when the xy velocity command is large enough but the robot's
+    actual xy base velocity is still below the idle threshold. Use a negative
+    reward weight to penalize this behavior.
+    """
+    asset: Articulation = env.scene[asset_cfg.name]
+
+    # Commanded xy velocity.
+    command = env.command_manager.get_command(command_name)
+    cmd_xy = command[:, :2]
+    cmd_magnitude = torch.linalg.vector_norm(cmd_xy, dim=-1)
+
+    # Actual base xy velocity in body frame.
+    vel_xy = asset.data.root_lin_vel_b[:, :2]
+    vel_magnitude = torch.linalg.vector_norm(vel_xy, dim=-1)
+
+    is_commanded = cmd_magnitude > cmd_threshold
+    is_idle = vel_magnitude < vel_threshold
+
+    return (is_commanded & is_idle).float()
+

@@ -39,9 +39,9 @@ class OpenRobotActionsCfg(ActionsCfg):
         clip={
             ".*_hip_joint": (-0.2, 0.2),
             "^(FR|RR)_thigh_joint$": (-1.5, 0.0),
-            "^(FR|RR)_calf_joint$": (-1.6, 0.3),
+            "^(FR|RR)_calf_joint$": (-1.6, 0.6),
             "^(FL|RL)_thigh_joint$": (0.0, 1.5),
-            "^(FL|RL)_calf_joint$": (-0.3, 1.6),
+            "^(FL|RL)_calf_joint$": (-0.6, 1.6),
         },
     )
 
@@ -59,10 +59,15 @@ class OpenRobotTrotEnvCfg(Go2TrotEnvCfg):
         # A slower gait clock suits the 110 kg platform and its 0.45 m lower legs.
         self.observations.policy.gait_clock.params["cycle_time"] = 0.8
         self.observations.critic.gait_clock.params["cycle_time"] = 0.8
+
         self.rewards.trot.params["cycle_time"] = 0.8
         self.rewards.feet_clearance.params["cycle_time"] = 0.8
         self.rewards.feet_clearance.params["target_height"] = 0.08
-        self.rewards.base_height.params["target_height"] = 0.58
+        self.rewards.base_height.params["target_height"] = 0.69
+
+        self.rewards.track_lin_vel_xy.weight = 5.0
+        self.rewards.track_ang_vel_z.weight = 5.0
+        self.rewards.trot.weight = 1.5
 
         self.commands.base_velocity.ranges.lin_vel_x = (-0.8, 0.8)
         self.commands.base_velocity.ranges.lin_vel_y = (-0.5, 0.5)
@@ -121,3 +126,7 @@ class OpenRobotTrotEnvCfg_PLAY(OpenRobotTrotEnvCfg):
         }
         self.events.reset_robot_joints.params["position_range"] = (0.0, 0.0)
         self.commands.base_velocity.debug_vis = True
+
+        self.commands.base_velocity.ranges.lin_vel_x = (0.5, 0.5)
+        self.commands.base_velocity.ranges.lin_vel_y = (0.0, 0.0)
+        self.commands.base_velocity.ranges.ang_vel_z = (0.0, 0.0)

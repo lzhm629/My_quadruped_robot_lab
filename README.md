@@ -60,14 +60,14 @@ python My_quadruped_robot_lab/scripts/rsl_rl/train.py \
   --headless
 ```
 
-Go2 默认使用 4096 个环境，OpenRobot 默认使用 2048 个环境；两者均为每环境每轮 24 步、最多 15000 次迭代。显存不足时添加 `--num_envs 1024` 或更小的值。训练输出写入：
+Go2 默认使用 4096 个环境，OpenRobot 默认使用 4096 个环境；两者均为每环境每轮 24 步、最多 15000 次迭代。显存不足时添加 `--num_envs 1024` 或更小的值。训练输出写入：
 
 ```text
 My_quadruped_robot_lab/logs/rsl_rl/openrobot_go2_trot/<运行时间>/
 My_quadruped_robot_lab/logs/rsl_rl/openrobot_wheelfixed_trot/<运行时间>/
 ```
 
-Hydra 的运行元数据统一写入 `My_quadruped_robot_lab/outputs/`。两类输出路径都以项目目录为基准，因而从任意工作目录启动脚本都不会把文件写到工作区根目录。
+Hydra 的运行元数据统一写入 `My_quadruped_robot_lab/outputs/`。
 
 ## 回放新模型
 

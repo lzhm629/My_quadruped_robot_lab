@@ -305,6 +305,17 @@ class RewardsCfg:
         params={"command_name": "base_velocity", "sensor_cfg": FOOT_SENSOR_CFG},
     )
 
+    idle_penalty = RewTerm(
+    func=mdp.idle_when_commanded,
+    weight=-5.0,
+    params={
+        "command_name": "base_velocity",
+        "cmd_threshold": 0.2,
+        "vel_threshold": 0.1,
+        "asset_cfg": ROBOT_CFG,
+    },
+)
+
 
 @configclass
 class TerminationsCfg:
@@ -351,3 +362,7 @@ class Go2TrotEnvCfg_PLAY(Go2TrotEnvCfg):
         self.events.actuator_gains = None
         self.events.push_robot = None
         self.commands.base_velocity.debug_vis = True
+
+        self.commands.base_velocity.ranges.lin_vel_x = (0.5, 0.5)
+        self.commands.base_velocity.ranges.lin_vel_y = (0.0, 0.0)
+        self.commands.base_velocity.ranges.ang_vel_z = (0.0, 0.0)

@@ -1,7 +1,6 @@
-base height:0.57
+base height:0.69
 hip:0.0
-thigh:-0.3
-calf:-0.1
+thigh:-0.7
+calf:0.3
 
 hip: -0.2~0.2
-thigh、calf限位的正负号反一下
