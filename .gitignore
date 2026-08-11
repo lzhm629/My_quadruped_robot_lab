@@ -1,0 +1,12 @@
+__pycache__/
+*.py[cod]
+.pytest_cache/
+
+# Isaac Lab / Hydra runtime output
+logs/
+outputs/
+
+# Editable Python build output
+*.egg-info/
+build/
+dist/

@@ -1,0 +1,20 @@
+[package]
+version = "0.1.0"
+category = "isaaclab"
+readme = "README.md"
+title = "OpenRobot Lab"
+author = "OpenRobot Lab Developers"
+maintainer = "OpenRobot Lab Developers"
+description = "Isaac Lab environments for extensible quadruped robot learning."
+repository = ""
+keywords = ["isaaclab", "quadruped", "unitree", "reinforcement-learning"]
+
+[dependencies]
+"isaaclab" = {}
+"isaaclab_assets" = {}
+"isaaclab_rl" = {}
+"isaaclab_tasks" = {}
+
+[[python.module]]
+name = "My_quadruped_robot_lab"
+
