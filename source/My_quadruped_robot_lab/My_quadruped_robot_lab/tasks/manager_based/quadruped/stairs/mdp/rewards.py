@@ -23,7 +23,8 @@ def terrain_relative_base_height_l2(
     """Penalize base height relative to the locally scanned stair surface."""
     asset: Articulation = env.scene[asset_cfg.name]
     sensor: RayCaster = env.scene.sensors[sensor_cfg.name]
-    terrain_height = torch.mean(sensor.data.ray_hits_w[..., 2], dim=1)
+    ray_heights = torch.nan_to_num(sensor.data.ray_hits_w[..., 2], nan=0.0, posinf=0.0, neginf=0.0)
+    terrain_height = torch.mean(ray_heights, dim=1)
     return torch.square(asset.data.root_pos_w[:, 2] - terrain_height - target_height)
 
 

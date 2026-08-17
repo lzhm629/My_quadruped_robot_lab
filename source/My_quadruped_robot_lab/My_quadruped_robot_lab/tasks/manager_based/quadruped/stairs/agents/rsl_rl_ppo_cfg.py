@@ -15,7 +15,6 @@ class OpenRobotStairsPPORunnerCfg(RslRlOnPolicyRunnerCfg):
     clip_actions = 10.0
     policy = RslRlPpoActorCriticCfg(
         init_noise_std=0.7,
-        noise_std_type="log",
         actor_hidden_dims=[512, 256, 128],
         critic_hidden_dims=[512, 256, 128],
         activation="elu",
@@ -28,7 +27,7 @@ class OpenRobotStairsPPORunnerCfg(RslRlOnPolicyRunnerCfg):
         num_learning_epochs=5,
         num_mini_batches=4,
         learning_rate=1.0e-5,
-        schedule="fixed",
+        schedule="adaptive",
         gamma=0.99,
         lam=0.95,
         desired_kl=0.01,

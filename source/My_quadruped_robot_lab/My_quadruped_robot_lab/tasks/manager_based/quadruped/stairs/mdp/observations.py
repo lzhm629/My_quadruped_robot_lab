@@ -29,4 +29,5 @@ def terrain_heights(
 ) -> torch.Tensor:
     """Return absolute world-frame terrain heights for the privileged critic input."""
     sensor: RayCaster = env.scene.sensors[sensor_cfg.name]
-    return sensor.data.ray_hits_w[..., 2]
+    ray_heights = sensor.data.ray_hits_w[..., 2]
+    return torch.nan_to_num(ray_heights, nan=0.0, posinf=0.0, neginf=0.0)
