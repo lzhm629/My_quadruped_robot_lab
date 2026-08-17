@@ -44,7 +44,7 @@ def main():
     index = 0
     # acquire all Isaac environments names
     for task_spec in gym.registry.values():
-        if task_spec.id.startswith("OpenRobot-"):
+        if task_spec.id.startswith(("go2_", "openrobot_")):
             # add details to table
             table.add_row([index + 1, task_spec.id, task_spec.entry_point, task_spec.kwargs["env_cfg_entry_point"]])
             # increment count

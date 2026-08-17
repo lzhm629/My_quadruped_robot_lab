@@ -1,27 +1,20 @@
-"""RSL-RL PPO configuration for legacy Go2 trot."""
+"""RSL-RL PPO configuration for OpenRobot stair climbing."""
 
 from isaaclab.utils import configclass
-from isaaclab_rl.rsl_rl import (
-    RslRlOnPolicyRunnerCfg,
-    RslRlPpoActorCriticCfg,
-    RslRlPpoAlgorithmCfg,
-    RslRlSymmetryCfg,
-)
-
-from ..mdp import quadruped_trot_symmetry
+from isaaclab_rl.rsl_rl import RslRlOnPolicyRunnerCfg, RslRlPpoActorCriticCfg, RslRlPpoAlgorithmCfg
 
 
 @configclass
-class Go2TrotPPORunnerCfg(RslRlOnPolicyRunnerCfg):
+class OpenRobotStairsPPORunnerCfg(RslRlOnPolicyRunnerCfg):
     seed = 1
     num_steps_per_env = 24
-    max_iterations = 15000
+    max_iterations = 30000
     save_interval = 100
-    experiment_name = "go2_trot"
+    experiment_name = "openrobot_wheelfixed_stairs"
     empirical_normalization = False
-    clip_actions = 100.0
+    clip_actions = 10.0
     policy = RslRlPpoActorCriticCfg(
-        init_noise_std=1.0,
+        init_noise_std=0.7,
         actor_hidden_dims=[512, 256, 128],
         critic_hidden_dims=[512, 256, 128],
         activation="elu",
@@ -39,10 +32,4 @@ class Go2TrotPPORunnerCfg(RslRlOnPolicyRunnerCfg):
         lam=0.95,
         desired_kl=0.01,
         max_grad_norm=1.0,
-        symmetry_cfg=RslRlSymmetryCfg(
-            use_data_augmentation=False,
-            use_mirror_loss=True,
-            data_augmentation_func=quadruped_trot_symmetry,
-            mirror_loss_coeff=1.0,
-        ),
     )

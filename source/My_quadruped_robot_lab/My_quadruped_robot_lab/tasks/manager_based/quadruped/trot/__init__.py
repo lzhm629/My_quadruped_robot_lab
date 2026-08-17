@@ -1,4 +1,4 @@
-"""Gymnasium registration for the Go2 trot task."""
+"""Gymnasium registration for the quadruped trot tasks."""
 
 import gymnasium as gym
 
@@ -6,7 +6,7 @@ from . import agents
 
 
 gym.register(
-    id="OpenRobot-Velocity-Trot-Unitree-Go2-v0",
+    id="go2_trot",
     entry_point="isaaclab.envs:ManagerBasedRLEnv",
     disable_env_checker=True,
     kwargs={
@@ -16,7 +16,7 @@ gym.register(
 )
 
 gym.register(
-    id="OpenRobot-Velocity-Trot-Unitree-Go2-Play-v0",
+    id="go2_trot_play",
     entry_point="isaaclab.envs:ManagerBasedRLEnv",
     disable_env_checker=True,
     kwargs={
@@ -26,7 +26,7 @@ gym.register(
 )
 
 gym.register(
-    id="OpenRobot-Velocity-Trot-OpenRobot-WheelFixed-v0",
+    id="openrobot_wheelfixed_trot",
     entry_point="isaaclab.envs:ManagerBasedRLEnv",
     disable_env_checker=True,
     kwargs={
@@ -38,7 +38,7 @@ gym.register(
 )
 
 gym.register(
-    id="OpenRobot-Velocity-Trot-OpenRobot-WheelFixed-Play-v0",
+    id="openrobot_wheelfixed_trot_play",
     entry_point="isaaclab.envs:ManagerBasedRLEnv",
     disable_env_checker=True,
     kwargs={

@@ -1,6 +1,6 @@
-# My_quadruped_robot_lab：Go2 / OpenRobot Trot（Isaac Lab）
+# My_quadruped_robot_lab：Go2 / OpenRobot 运动任务（Isaac Lab）
 
-本目录包含从 `My_unitree_go2_gym` 迁移出的 Go2 trot 训练任务，以及课题组自研 OpenRobot 轮子固定版的 trot 任务。旧 checkpoint 不参与迁移；模型从头训练。
+本目录包含从 `My_unitree_go2_gym` 迁移出的 Go2 trot 训练任务，以及课题组自研 OpenRobot 轮子固定版的 trot 和 stairs 任务。旧 checkpoint 不参与迁移；模型从头训练。
 
 ## 当前实现
 
@@ -12,6 +12,8 @@
 - 启用摩擦、质量、质心、执行器增益、初始状态和外力推扰随机化。
 - 执行器使用 1--3 个物理步的随机延迟，并在 PPO 中启用左右镜像损失。
 - OpenRobot 资产采用低模凸碰撞体，膝部轮子通过固定关节保留为刚体，控制空间仅包含 12 个腿部关节。
+- 提供 OpenRobot 轮固定版的三级楼梯课程，台阶高度固定为 0.15 m，踏步深度依次为 0.30、0.28、0.25 m。
+- 提供 OpenRobot 轮固定版的 MuJoCo sim2sim 部署，支持预设速度和 viewer 键盘速度控制。
 
 ## 安装
 
@@ -32,12 +34,16 @@ export PYTHONPATH="$PWD/My_quadruped_robot_lab/source/My_quadruped_robot_lab:$PY
 python My_quadruped_robot_lab/scripts/list_envs.py
 
 python My_quadruped_robot_lab/scripts/zero_agent.py \
-  --task OpenRobot-Velocity-Trot-Unitree-Go2-v0 \
+  --task go2_trot \
   --num_envs 4 --num_steps 20 --headless
 
 python My_quadruped_robot_lab/scripts/zero_agent.py \
-  --task OpenRobot-Velocity-Trot-OpenRobot-WheelFixed-Play-v0 \
+  --task openrobot_wheelfixed_trot_play \
   --num_envs 4 --num_steps 300 --headless
+
+python My_quadruped_robot_lab/scripts/zero_agent.py \
+  --task openrobot_wheelfixed_stairs_play \
+  --num_envs 1 --num_steps 300 --headless
 ```
 
 调试 OpenRobot 默认关节姿态时，启动独立的可视化调姿工具：
@@ -52,19 +58,24 @@ python My_quadruped_robot_lab/scripts/tools/tune_openrobot_default_pose.py
 
 ```bash
 python My_quadruped_robot_lab/scripts/rsl_rl/train.py \
-  --task OpenRobot-Velocity-Trot-Unitree-Go2-v0 \
+  --task go2_trot \
   --headless
 
 python My_quadruped_robot_lab/scripts/rsl_rl/train.py \
-  --task OpenRobot-Velocity-Trot-OpenRobot-WheelFixed-v0 \
+  --task openrobot_wheelfixed_trot \
+  --headless
+
+python My_quadruped_robot_lab/scripts/rsl_rl/train.py \
+  --task openrobot_wheelfixed_stairs \
   --headless
 ```
 
-Go2 默认使用 4096 个环境，OpenRobot 默认使用 4096 个环境；两者均为每环境每轮 24 步、最多 15000 次迭代。显存不足时添加 `--num_envs 1024` 或更小的值。训练输出写入：
+Go2 和 OpenRobot 默认均使用 4096 个环境，每环境每轮 24 步；trot 任务最多 15000 次迭代，OpenRobot stairs 任务最多 30000 次迭代。显存不足时添加 `--num_envs 1024` 或更小的值。训练输出写入：
 
 ```text
-My_quadruped_robot_lab/logs/rsl_rl/openrobot_go2_trot/<运行时间>/
+My_quadruped_robot_lab/logs/rsl_rl/go2_trot/<运行时间>/
 My_quadruped_robot_lab/logs/rsl_rl/openrobot_wheelfixed_trot/<运行时间>/
+My_quadruped_robot_lab/logs/rsl_rl/openrobot_wheelfixed_stairs/<运行时间>/
 ```
 
 Hydra 的运行元数据统一写入 `My_quadruped_robot_lab/outputs/`。
@@ -73,15 +84,80 @@ Hydra 的运行元数据统一写入 `My_quadruped_robot_lab/outputs/`。
 
 ```bash
 python My_quadruped_robot_lab/scripts/rsl_rl/play.py \
-  --task OpenRobot-Velocity-Trot-Unitree-Go2-Play-v0 \
-  --checkpoint My_quadruped_robot_lab/logs/rsl_rl/openrobot_go2_trot/<运行时间>/model_<迭代数>.pt
+  --task go2_trot_play \
+  --checkpoint My_quadruped_robot_lab/logs/rsl_rl/go2_trot/<运行时间>/model_<迭代数>.pt
 
 python My_quadruped_robot_lab/scripts/rsl_rl/play.py \
-  --task OpenRobot-Velocity-Trot-OpenRobot-WheelFixed-Play-v0 \
+  --task openrobot_wheelfixed_trot_play \
   --checkpoint My_quadruped_robot_lab/logs/rsl_rl/openrobot_wheelfixed_trot/<运行时间>/model_<迭代数>.pt
+
+python My_quadruped_robot_lab/scripts/rsl_rl/play.py \
+  --task openrobot_wheelfixed_stairs_play \
+  --checkpoint My_quadruped_robot_lab/logs/rsl_rl/openrobot_wheelfixed_stairs/<运行时间>/model_<迭代数>.pt
 ```
 
 回放脚本同时导出 JIT 和 ONNX 策略。这里的 checkpoint 必须是本任务新训练出的模型；旧项目 checkpoint 的网络输入和运行时接口不兼容。
+
+## MuJoCo Sim2Sim
+
+部署器使用 IsaacLab 回放时导出的 TorchScript `policy.pt`，物理频率为 200 Hz、策略频率为 50 Hz。它复刻了训练环境的 470 维 policy 输入，包括按观测项排列的 10 帧历史、投影重力、逐关节动作缩放、默认关节偏置、延迟 PD、armature 和力矩限制。
+
+安装项目时会自动安装官方 MuJoCo；已有 editable 安装可单独补装：
+
+```bash
+conda activate env_isaaclab
+python -m pip install "mujoco>=3.2,<4"
+```
+
+仓库已经包含生成后的 OpenRobot MJCF。修改 URDF、碰撞网格或惯量后，重新生成并校验模型：
+
+```bash
+python My_quadruped_robot_lab/scripts/sim2sim/generate_openrobot_mjcf.py
+```
+
+### default：预设速度命令
+
+`default` 模式在整个仿真期间使用命令行给定的速度。速度范围与训练配置一致：`vx` 为 ±0.8 m/s、`vy` 为 ±0.5 m/s、`yaw` 为 ±0.6 rad/s。
+
+```bash
+python My_quadruped_robot_lab/scripts/sim2sim/run_mujoco.py \
+  --mode default --vx 0.8 --vy 0.0 --yaw 0.0
+```
+
+不打开 viewer 的快速检查或数据采集：
+
+```bash
+python My_quadruped_robot_lab/scripts/sim2sim/run_mujoco.py \
+  --mode default --vx 0.0 --vy 0.0 --yaw 0.0 \
+  --duration 5 --headless --no-real-time \
+  --log My_quadruped_robot_lab/logs/mujoco/standing.csv
+```
+
+### keyboard：键盘速度控制
+
+```bash
+python My_quadruped_robot_lab/scripts/sim2sim/run_mujoco.py \
+  --mode keyboard --vx 0.0 --vy 0.0 --yaw 0.0 --duration 0
+```
+
+MuJoCo viewer 窗口获得焦点后使用：
+
+- `W` / `S`：增加 / 减小前向速度。
+- `A` / `D`：增加 / 减小横向速度。
+- `Q` / `E`：增加 / 减小偏航角速度。
+- `Space`：立即把三个速度命令清零。
+
+默认加载最新训练成功运行导出的 `policy.pt`。部署其他 checkpoint 时先用 IsaacLab `play.py` 导出，再显式传入：
+
+```bash
+python My_quadruped_robot_lab/scripts/sim2sim/run_mujoco.py \
+  --mode default \
+  --policy My_quadruped_robot_lab/logs/rsl_rl/openrobot_wheelfixed_trot/<运行时间>/exported/policy.pt
+```
+
+执行器延迟默认固定为 2 个物理步，可用 `--hip-thigh-delay` 和 `--calf-delay` 在 0--3 步间分别调整。训练时每次环境重置会在 1--3 步随机采样，而单机器人部署使用固定值以保证实验可重复。
+
+当前已验证 MJCF 可加载、关节映射为 12 个策略自由度、JIT 输入输出为 `470 -> 12`，并可在 headless 模式完成闭环步进和 CSV 记录。由于 PhysX 与 MuJoCo 的网格接触、固定轮碰撞和求解器差异，当前策略在 MuJoCo 中长时间运动仍可能失稳；正式评价 sim2sim 成功率前，应继续标定足端/轮子碰撞、接触参数和执行器模型。该限制不影响两种命令模式及部署链路的使用。
 
 ## 代码入口与扩展方式
 
@@ -91,6 +167,9 @@ python My_quadruped_robot_lab/scripts/rsl_rl/play.py \
 - `trot/openrobot_env_cfg.py`：OpenRobot 专用动作范围、机身/足端接触、随机化和高度参数。
 - `trot/mdp/`：自定义 trot 观测、奖励与镜像变换。
 - `trot/agents/rsl_rl_ppo_cfg.py`：PPO 与镜像损失配置。
+- `stairs/terrain_cfg.py`：0.15 m 高、三级离散踏步深度的单向楼梯。
+- `stairs/openrobot_env_cfg.py`：OpenRobot stairs 的观测、奖励、课程和训练/回放配置。
+- `scripts/sim2sim/`：MuJoCo 模型生成、观测历史、显式 PD 和双模式运行入口。
 
 增加其他机器狗时，新建独立的 `assets/<robot>.py`，并以共享 locomotion 配置为基类覆盖关节/足端名称、默认姿态、执行器和机器人特有参数。不要把 Go2 的名称或物理参数继续写入共享 MDP 函数。
 

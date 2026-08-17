@@ -127,6 +127,15 @@ class OpenRobotTrotEnvCfg_PLAY(OpenRobotTrotEnvCfg):
         self.events.reset_robot_joints.params["position_range"] = (0.0, 0.0)
         self.commands.base_velocity.debug_vis = True
 
-        self.commands.base_velocity.ranges.lin_vel_x = (0.5, 0.5)
-        self.commands.base_velocity.ranges.lin_vel_y = (0.0, 0.0)
-        self.commands.base_velocity.ranges.ang_vel_z = (0.0, 0.0)
+
+        self.use_play_command = True
+
+        vx = 0.8
+        vy = 0.0
+        vz = 0.6
+
+        if(self.use_play_command):
+            self.commands.base_velocity.ranges.lin_vel_x = (vx, vx)
+            self.commands.base_velocity.ranges.lin_vel_y = (vy, vy)
+            self.commands.base_velocity.ranges.ang_vel_z = (vz, vz)
+

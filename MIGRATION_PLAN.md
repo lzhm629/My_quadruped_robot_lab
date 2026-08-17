@@ -240,19 +240,19 @@ class UnitreeGo2TrotEnvCfg(TrotEnvCfg):
 
 ### 4.3 任务注册命名
 
-建议统一使用带命名空间的 Gymnasium ID：
+建议统一使用简短的 Gymnasium ID：
 
 ```text
-OpenRobot-Velocity-Trot-Unitree-Go2-v0
-OpenRobot-Velocity-Stairs-Unitree-Go2-v0
-OpenRobot-Jump-Periodic-Unitree-Go2-v0
-OpenRobot-Stand-Hand-Unitree-Go2-v0
-OpenRobot-Stand-Hind-Unitree-Go2-v0
-OpenRobot-Jump-Spring-Unitree-Go2-v0
-OpenRobot-Flip-Back-Unitree-Go2-v0
+go2_trot
+go2_stairs
+go2_jump
+go2_handstand
+go2_leggedstand
+go2_spring_jump
+go2_backflip
 ```
 
-每个训练任务同时注册 `-Play-v0` 变体：减少环境数量、关闭 corruption/随机推扰/课程并固定命令。不要用运行时 `cfg.env.test` 分支改变同一个环境定义。
+每个训练任务同时注册 `_play` 变体：减少环境数量、关闭 corruption/随机推扰/课程并固定命令。不要用运行时 `cfg.env.test` 分支改变同一个环境定义。
 
 ## 5. Isaac Gym → Isaac Lab 映射
 
@@ -462,7 +462,7 @@ WAIT → TRIGGERED → TAKEOFF → FLIGHT → LANDED → DONE
 
 1. 用官方 template 在 `My_quadruped_robot_lab` 生成外部 extension；
 2. 建立 `GO2_LEGACY_CFG`，优先复现旧 URDF 控制参数；
-3. 注册 `OpenRobot-Velocity-Trot-Unitree-Go2-v0` 及 Play 变体；
+3. 注册 `go2_trot` 及 `go2_trot_play` 变体；
 4. 先实现无延迟、无随机化、单帧观测的 deterministic smoke test；
 5. 再依次打开 10 帧历史、critic group、随机化、物理步延迟和 symmetry；
 6. 每打开一项都保存回归数据，避免一次性迁移后无法定位偏差；
@@ -474,9 +474,9 @@ WAIT → TRIGGERED → TAKEOFF → FLIGHT → LANDED → DONE
 conda activate env_isaaclab
 python -m pip install -e source/My_quadruped_robot_lab
 python scripts/list_envs.py
-python scripts/zero_agent.py --task OpenRobot-Velocity-Trot-Unitree-Go2-v0 --num_envs 16
-python scripts/rsl_rl/train.py --task OpenRobot-Velocity-Trot-Unitree-Go2-v0 --headless
-python scripts/rsl_rl/play.py --task OpenRobot-Velocity-Trot-Unitree-Go2-Play-v0 --checkpoint <path>
+python scripts/zero_agent.py --task go2_trot --num_envs 16
+python scripts/rsl_rl/train.py --task go2_trot --headless
+python scripts/rsl_rl/play.py --task go2_trot_play --checkpoint <path>
 ```
 
 ## 12. 最终交付定义
