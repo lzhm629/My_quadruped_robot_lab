@@ -33,14 +33,6 @@ export PYTHONPATH="$PWD/My_quadruped_robot_lab/source/My_quadruped_robot_lab:$PY
 
 ```bash
 python My_quadruped_robot_lab/scripts/list_envs.py
-
-python My_quadruped_robot_lab/scripts/zero_agent.py \
-  --task go2_trot \
-  --num_envs 4 --num_steps 20 --headless
-
-python My_quadruped_robot_lab/scripts/zero_agent.py \
-  --task openrobot_wheelfixed_trot_play \
-  --num_envs 4 --num_steps 300 --headless
 ```
 
 调试 OpenRobot 默认关节姿态时，启动独立的可视化调姿工具：
