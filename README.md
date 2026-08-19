@@ -161,6 +161,75 @@ python My_quadruped_robot_lab/scripts/sim2sim/run_mujoco.py \
 
 ## 代码入口与扩展方式
 
+### Go2 stairs DreamWaQ
+
+该任务使用独立的混合课程地形和项目内 DreamWaQ runner，不依赖 `openrobot_wheelfixed_stairs`。
+默认训练张量为当前观测 45 维、5 帧历史 225 维、3 帧 critic 特权观测 783 维，
+context VAE 输出 3 维速度估计和 16 维隐变量。
+
+训练：
+
+```bash
+python My_quadruped_robot_lab/scripts/rsl_rl/train_dreamwaq.py \
+  --task go2_stairs_dreamwaq --headless
+```
+
+小规模检查：
+
+```bash
+python My_quadruped_robot_lab/scripts/rsl_rl/train_dreamwaq.py \
+  --task go2_stairs_dreamwaq --num_envs 32 --max_iterations 1 --headless
+```
+
+回放最新 checkpoint，并导出双输入 JIT 策略：
+
+```bash
+python My_quadruped_robot_lab/scripts/rsl_rl/play_dreamwaq.py \
+  --task go2_stairs_dreamwaq_play
+```
+
+指定 checkpoint：
+
+```bash
+python My_quadruped_robot_lab/scripts/rsl_rl/play_dreamwaq.py \
+  --task go2_stairs_dreamwaq_play \
+  --checkpoint My_quadruped_robot_lab/logs/rsl_rl/go2_stairs_dreamwaq/<run>/model_<iteration>.pt
+```
+
+回放时策略自动导出到 checkpoint 同级的 `exported/policy_dreamwaq.pt`，其前向接口为
+`policy(current_obs, observation_history)`，输入维度分别为 45 和 225。
+
+### OpenRobot wheel-fixed stairs DreamWaQ
+
+该任务与旧的 `openrobot_wheelfixed_stairs` 相互独立。四个 `foot` 是支撑和步态接触体，
+固定膝部轮子只作为非期望碰撞体。训练命令固定从 `vx [-0.8, 0.8] m/s`、
+`vy [-0.3, 0.3] m/s` 和 `wz [-0.5, 0.5] rad/s` 采样，不使用命令课程。
+地形课程同时增加楼梯高度并减小踏步深度，最高等级覆盖 `0.25 x 0.15 m` 目标楼梯。
+
+训练或断点续训使用通用 DreamWaQ 脚本：
+
+```bash
+python My_quadruped_robot_lab/scripts/rsl_rl/train_dreamwaq.py \
+  --task openrobot_wheelfixed_stairs_dreamwaq --headless
+
+python My_quadruped_robot_lab/scripts/rsl_rl/train_dreamwaq.py \
+  --task openrobot_wheelfixed_stairs_dreamwaq \
+  --resume --load_run -1 --load_checkpoint -1 --headless
+```
+
+在精确 `0.25 m` 深、`0.15 m` 高的楼梯上分别回放上楼和下楼策略：
+
+```bash
+python My_quadruped_robot_lab/scripts/rsl_rl/play_dreamwaq.py \
+  --task openrobot_wheelfixed_stairs_dreamwaq_play_up
+
+python My_quadruped_robot_lab/scripts/rsl_rl/play_dreamwaq.py \
+  --task openrobot_wheelfixed_stairs_dreamwaq_play_down
+```
+
+两个回放任务默认加载 `openrobot_wheelfixed_stairs_dreamwaq` 的最新 checkpoint，
+也可以通过 `--checkpoint <path>` 指定模型。回放时会同步导出双输入 JIT 策略。
+
 - `assets/go2.py`：Go2 资产、初始姿态和执行器配置。
 - `assets/openrobot.py`：OpenRobot 轮子固定版资产、调试后的默认站姿和 SETZ120/SETZ160 执行器配置。
 - `trot/trot_env_cfg.py`：场景、观测、动作、命令、随机化、奖励和终止条件。
@@ -169,6 +238,7 @@ python My_quadruped_robot_lab/scripts/sim2sim/run_mujoco.py \
 - `trot/agents/rsl_rl_ppo_cfg.py`：PPO 与镜像损失配置。
 - `stairs/terrain_cfg.py`：0.15 m 高、三级离散踏步深度的单向楼梯。
 - `stairs/openrobot_env_cfg.py`：OpenRobot stairs 的观测、奖励、课程和训练/回放配置。
+- `openrobot_wheelfixed_stairs_dreamwaq/`：独立 DreamWaQ 楼梯地形、环境、奖励和上下楼回放配置。
 - `scripts/sim2sim/`：MuJoCo 模型生成、观测历史、显式 PD 和双模式运行入口。
 
 增加其他机器狗时，新建独立的 `assets/<robot>.py`，并以共享 locomotion 配置为基类覆盖关节/足端名称、默认姿态、执行器和机器人特有参数。不要把 Go2 的名称或物理参数继续写入共享 MDP 函数。

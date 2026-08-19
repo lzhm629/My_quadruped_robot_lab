@@ -65,3 +65,21 @@ GO2_LEGACY_CFG = ArticulationCfg(
     },
 )
 """Legacy Go2 URDF with the trot task's PD gains and 5--15 ms action delay."""
+
+
+GO2_DREAMWAQ_CFG = GO2_LEGACY_CFG.replace(
+    actuators={
+        "legs": DelayedPDActuatorCfg(
+            joint_names_expr=[".*_hip_joint", ".*_thigh_joint", ".*_calf_joint"],
+            effort_limit=23.7,
+            velocity_limit=30.1,
+            stiffness=25.0,
+            damping=0.5,
+            armature=0.0,
+            friction=0.0,
+            min_delay=0,
+            max_delay=3,
+        )
+    }
+)
+"""Go2 configuration matching the legacy stairs DreamWaQ controller."""
