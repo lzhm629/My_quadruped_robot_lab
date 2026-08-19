@@ -280,7 +280,7 @@ class OpenRobotWheelFixedStairsDreamWaQEnvCfg_PLAY_UP(
     _PlayMixin, OpenRobotWheelFixedStairsDreamWaQEnvCfg
 ):
     play_terrain = OPENROBOT_DREAMWAQ_PLAY_UP_TERRAINS_CFG
-    play_speed = 0.30
+    play_speed = 0.50
 
 
 @configclass
@@ -288,4 +288,4 @@ class OpenRobotWheelFixedStairsDreamWaQEnvCfg_PLAY_DOWN(
     _PlayMixin, OpenRobotWheelFixedStairsDreamWaQEnvCfg
 ):
     play_terrain = OPENROBOT_DREAMWAQ_PLAY_DOWN_TERRAINS_CFG
-    play_speed = 0.25
+    play_speed = 0.45

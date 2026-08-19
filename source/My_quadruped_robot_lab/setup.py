@@ -23,10 +23,9 @@ setup(
             "assets/data/openrobot_wheelfixed/urdf/*",
             "assets/data/openrobot_wheelfixed/meshes/*",
             "assets/data/openrobot_wheelfixed/collision/*",
-            "assets/data/openrobot_wheelfixed/mjcf/*",
         ]
     },
     python_requires=">=3.11",
-    install_requires=["toml", "mujoco>=3.2,<4"],
+    install_requires=["toml"],
     zip_safe=False,
 )
