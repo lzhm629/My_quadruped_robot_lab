@@ -205,6 +205,8 @@ python My_quadruped_robot_lab/scripts/rsl_rl/play_dreamwaq.py \
 固定膝部轮子只作为非期望碰撞体。训练命令固定从 `vx [-0.8, 0.8] m/s`、
 `vy [-0.3, 0.3] m/s` 和 `wz [-0.5, 0.5] rad/s` 采样，不使用命令课程。
 地形课程同时增加楼梯高度并减小踏步深度，最高等级覆盖 `0.25 x 0.15 m` 目标楼梯。
+4096 环境下 OpenRobot 的刚体和三角网格接触量较大，任务将 PhysX GPU narrowphase
+`collisionStackSize` 配置为 `2**28`（256 MiB），避免默认 64 MiB 缓冲区溢出后丢弃接触。
 
 训练或断点续训使用通用 DreamWaQ 脚本：
 
@@ -216,6 +218,12 @@ python My_quadruped_robot_lab/scripts/rsl_rl/train_dreamwaq.py \
   --task openrobot_wheelfixed_stairs_dreamwaq \
   --resume --load_run -1 --load_checkpoint -1 --headless
 ```
+
+必须使用 `train_dreamwaq.py`。普通 `scripts/rsl_rl/train.py` 使用标准 RSL-RL runner，
+不会训练 DreamWaQ 的历史编码器和 VAE。正常日志应包含 `vae` 和 `vel` 损失。
+如果 PhysX 输出 `collisionStackSize buffer overflow` 或 `Contacts have been dropped`，
+说明接触求解已经不完整，不能继续使用该次训练结果；应检查是否加载了本任务的最新配置，
+或降低 `--num_envs` 后重新启动训练。
 
 在精确 `0.25 m` 深、`0.15 m` 高的楼梯上分别回放上楼和下楼策略：
 

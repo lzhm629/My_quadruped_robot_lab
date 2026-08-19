@@ -210,6 +210,9 @@ class OpenRobotWheelFixedStairsDreamWaQEnvCfg(ManagerBasedRLEnvCfg):
         self.sim.physics_material = self.scene.terrain.physics_material
         self.sim.physx.bounce_threshold_velocity = 0.5
         self.sim.physx.gpu_max_rigid_patch_count = 10 * 2**15
+        # The default 64 MiB narrowphase stack overflows with 4096 OpenRobot
+        # instances on the mixed trimesh terrain and silently drops contacts.
+        self.sim.physx.gpu_collision_stack_size = 2**28
         self.scene.height_scanner.update_period = self.decimation * self.sim.dt
         self.scene.base_height_scanner.update_period = self.decimation * self.sim.dt
 
