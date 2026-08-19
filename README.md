@@ -144,7 +144,7 @@ python My_quadruped_robot_lab/scripts/rsl_rl/train_dreamwaq.py \
 
 #### 回放模型
 
-Go2 回放任务默认加载最新 checkpoint；通过 `--checkpoint <path>` 可以指定模型。
+Go2 回放任务通过 `--checkpoint <path>` 指定模型。
 
 ```bash
 python My_quadruped_robot_lab/scripts/rsl_rl/play_dreamwaq.py \
